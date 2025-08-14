@@ -1,1 +1,1 @@
-Backend for slidesdeck.app
+frontend for slidesdeck.app
