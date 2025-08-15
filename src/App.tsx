@@ -1,24 +1,24 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { API_BASE } from './lib/api'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+function App() {
+  const [topic, setTopic] = useState('')
+  const [message, setMessage] = useState('')
+  const [loading, setLoading] = useState(false)
 
-export default function App() {
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  async function ping() {
+  const ping = async () => {
     try {
-      setLoading(true);
-      const res = await fetch(`${API_BASE}/api/health`);
-      const data = await res.json();
-      setMessage(String(data?.message ?? "No message"));
-    } catch {
-      setMessage("Error contacting backend");
+      setLoading(true)
+      const res = await fetch(`${API_BASE}/api/health`)
+      const data = await res.json()
+      setMessage(data.message)
+    } catch (e) {
+      setMessage('Error contacting backend')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
@@ -27,20 +27,19 @@ export default function App() {
       <Card className="w-full max-w-xl shadow-lg">
         <CardHeader>
           <h1 className="text-2xl font-bold">SlidesDeck.app</h1>
-          <p className="text-sm text-muted-foreground">Week 1 – Hello World</p>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Input placeholder="Type anything (not used yet)" />
+          <Input placeholder="Type a topic (unused for now)" value={topic} onChange={e=>setTopic(e.target.value)} />
           <Button onClick={ping} disabled={loading}>
-            {loading ? "Contacting backend…" : "Fetch from backend"}
+            {loading ? 'Contacting backend…' : 'Fetch from backend'}
           </Button>
           {message && (
-            <div className="text-sm">
-              Backend says: <b>{message}</b>
-            </div>
+            <div className="text-sm text-gray-700">Backend says: <b>{message}</b></div>
           )}
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
+
+export default App
