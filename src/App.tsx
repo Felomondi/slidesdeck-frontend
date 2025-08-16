@@ -1,45 +1,62 @@
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { API_BASE } from './lib/api'
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { postJSON } from "./lib/api";
+import { SlideCard } from "./components/slide-card";
 
-function App() {
-  const [topic, setTopic] = useState('')
-  const [message, setMessage] = useState('')
-  const [loading, setLoading] = useState(false)
+type Slide = { slideTitle: string; talkingPoints: string[]; visualSuggestion?: string | null };
+type OutlineResponse = { topic: string; slides: Slide[] };
 
-  const ping = async () => {
+export default function App() {
+  const [topic, setTopic] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [outline, setOutline] = useState<OutlineResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function generate() {
+    setError(null);
+    setLoading(true);
     try {
-      setLoading(true)
-      const res = await fetch(`${API_BASE}/api/health`)
-      const data = await res.json()
-      setMessage(data.message)
+      const data = await postJSON<OutlineResponse>("/api/generate", { topic, slideCount: 6 });
+      setOutline(data);
     } catch (e) {
-      setMessage('Error contacting backend')
+      setError("Failed to generate outline");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-      <Card className="w-full max-w-xl shadow-lg">
-        <CardHeader>
-          <h1 className="text-2xl font-bold">SlidesDeck.app</h1>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Input placeholder="Type a topic (unused for now)" value={topic} onChange={e=>setTopic(e.target.value)} />
-          <Button onClick={ping} disabled={loading}>
-            {loading ? 'Contacting backend…' : 'Fetch from backend'}
-          </Button>
-          {message && (
-            <div className="text-sm text-gray-700">Backend says: <b>{message}</b></div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-4xl mx-auto space-y-4">
+        <Card className="shadow-lg">
+          <CardHeader>
+            <h1 className="text-2xl font-bold">SlidesDeck.app</h1>
+            <p className="text-sm text-muted-foreground">Week 2 – Generate Outline</p>
+          </CardHeader>
+          <CardContent className="flex gap-2">
+            <Input
+              placeholder="Enter your topic"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+            />
+            <Button onClick={generate} disabled={loading || !topic.trim()}>
+              {loading ? "Thinking…" : "Generate Outline"}
+            </Button>
+          </CardContent>
+        </Card>
 
-export default App
+        {error && <div className="text-sm text-red-600">{error}</div>}
+
+        {outline && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {outline.slides.map((s, i) => (
+              <SlideCard key={i} initial={s} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
