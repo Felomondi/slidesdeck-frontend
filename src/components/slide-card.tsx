@@ -11,7 +11,7 @@ export type Slide = {
 
 type Props = {
   initial: Slide;
-  resetKey?: number; // forces internal state reset when deck remounts
+  resetKey?: number;
 };
 
 export function SlideCard({ initial, resetKey }: Props) {
@@ -21,7 +21,6 @@ export function SlideCard({ initial, resetKey }: Props) {
   const [visual, setVisual] = useState<string>(initial.visualSuggestion ?? "");
 
   useEffect(() => {
-    // when parent remounts deck, reset fields
     setTitle(initial.slideTitle);
     setPoints(initial.talkingPoints ?? []);
     setNotes(initial.notes ?? "");
@@ -30,7 +29,11 @@ export function SlideCard({ initial, resetKey }: Props) {
 
   const uid = useId();
   const fade = useMemo(
-    () => ({ initial: { opacity: 0, y: 6 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.18 } }),
+    () => ({
+      initial: { opacity: 0, y: 6 },
+      animate: { opacity: 1, y: 0 },
+      transition: { duration: 0.18 },
+    }),
     []
   );
 
@@ -47,15 +50,20 @@ export function SlideCard({ initial, resetKey }: Props) {
   }
 
   return (
-    <motion.div {...fade} className="glass rounded-2xl border p-4 sm:p-5 transition-all duration-300 hover:glass-hover">
-      {/* Card header */}
+    <motion.div
+      {...fade}
+      className="glass rounded-2xl border p-4 sm:p-5 transition-all duration-300 hover:glass-hover
+                 border-sky-200/70 dark:border-sky-500/50"
+    >
+      {/* Title */}
       <div className="flex items-center gap-2">
         <GripVertical className="h-4 w-4 opacity-50" />
         <input
           aria-label="Slide title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full bg-transparent outline-none text-base sm:text-lg font-semibold tracking-tight"
+          className="w-full bg-transparent outline-none text-base sm:text-lg font-semibold tracking-tight 
+                     text-slate-900 dark:text-white"
         />
       </div>
 
@@ -70,53 +78,79 @@ export function SlideCard({ initial, resetKey }: Props) {
               value={p}
               onChange={(e) => updatePoint(i, e.target.value)}
               placeholder={`Talking point ${i + 1}`}
-              className="w-full bg-transparent outline-none text-sm sm:text-[0.95rem] py-1"
+              className="w-full bg-transparent outline-none text-sm sm:text-[0.95rem] py-1 
+                         text-slate-900 dark:text-white
+                         placeholder:text-slate-500 dark:placeholder:text-slate-400"
             />
             <button
               aria-label="Remove point"
               onClick={() => removePoint(i)}
-              className="opacity-0 group-hover:opacity-100 transition p-1 rounded hover:bg-white/10"
+              className="opacity-0 group-hover:opacity-100 transition p-1 rounded hover:bg-black/5 dark:hover:bg-white/10"
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-4 w-4 text-slate-500 hover:text-slate-700 dark:text-slate-300" />
             </button>
           </li>
         ))}
       </ul>
 
+      {/* Add point (your version kept) */}
       <div className="mt-3 flex gap-2">
         <button
           onClick={addPoint}
           className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium
-                     bg-white/15 hover:bg-white/25 border border-white/20"
+                     text-slate-800 dark:text-white
+                     bg-white/70 dark:bg-white/10
+                     border border-sky-300 dark:border-sky-500/60 hover:bg-white/80 dark:hover:bg-white/15"
         >
           <Plus className="h-3.5 w-3.5" />
           Add point
         </button>
       </div>
 
-      {/* Optional sections */}
       {(visual?.trim() || notes?.trim()) && <div className="my-4 hr rounded" />}
 
+      {/* Visual suggestion */}
       {visual?.trim() && (
-        <div className="mt-3">
-          <div className="text-xs uppercase tracking-wide opacity-60 mb-1.5">Visual suggestion</div>
+        <div
+          className="mt-3 rounded-xl p-2
+                     border-2 border-sky-200/80 bg-white/45
+                     dark:border-sky-500/50 dark:bg-white/5"
+        >
+          <div className="flex items-center gap-2 text-xs font-medium">
+            {/* FORCE light/dark colors via your CSS helper */}
+            <span className="legend-title uppercase tracking-wide">Visual suggestion</span>
+          </div>
           <textarea
             value={visual}
             onChange={(e) => setVisual(e.target.value)}
             rows={2}
-            className="w-full rounded-lg bg-white/10 border border-white/20 px-3 py-2 text-sm outline-none focus:ring-2 ring-sky-300/50"
+            className="mt-1.5 w-full rounded-md bg-transparent border-0 px-2 py-1.5 text-sm
+                       outline-none focus:ring-2 ring-sky-300/50 dark:ring-sky-600/40
+                       text-slate-900 dark:text-white
+                       placeholder:text-slate-500 dark:placeholder:text-slate-400"
           />
         </div>
       )}
 
+      {/* Speaker notes */}
       {notes?.trim() && (
-        <div className="mt-3">
-          <div className="text-xs uppercase tracking-wide opacity-60 mb-1.5">Speaker notes</div>
+        <div
+          className="mt-3 rounded-xl p-2
+                     border-2 border-sky-200/80 bg-white/45
+                     dark:border-sky-500/50 dark:bg-white/5"
+        >
+          <div className="flex items-center gap-2 text-xs font-medium">
+            {/* FORCE light/dark colors via your CSS helper */}
+            <span className="legend-title uppercase tracking-wide">Speaker notes</span>
+          </div>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
-            className="w-full rounded-lg bg-white/10 border border-white/20 px-3 py-2 text-sm outline-none focus:ring-2 ring-sky-300/50"
+            className="mt-1.5 w-full rounded-md bg-transparent border-0 px-2 py-1.5 text-sm
+                       outline-none focus:ring-2 ring-sky-300/50 dark:ring-sky-600/40
+                       text-slate-900 dark:text-white
+                       placeholder:text-slate-500 dark:placeholder:text-slate-400"
           />
         </div>
       )}

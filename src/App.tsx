@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { TopBar } from "./components/topbar";
+import { FloatingThemeToggle } from "./components/theme-toggle";
 import { SlideCard, type Slide } from "./components/slide-card";
 import { SlideSkeleton } from "./components/skeletons";
 import { ProgressBar } from "./components/progress-bar";
@@ -49,6 +50,9 @@ export default function App() {
   return (
     <div className="min-h-screen bg-app">
       <TopBar />
+      <FloatingThemeToggle />
+
+      {/* Background gradient */}
 
       <main className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
         {/* Generator panel */}
@@ -87,13 +91,14 @@ export default function App() {
           </div>
 
           {/* Settings with clear blue borders */}
-          <fieldset className="mt-4 rounded-xl border-2 border-sky-200/80 bg-white/45 p-4">
-            <legend className="px-2">
-              <div className="inline-flex items-center gap-2 text-sm font-medium text-sky-800">
-                <SlidersHorizontal className="h-4 w-4" />
-                Slide settings
-              </div>
-            </legend>
+          <fieldset className="mt-4 rounded-xl border-2 border-sky-200/80 bg-white/45 p-4
+                    dark:border-sky-500/60 dark:bg-white/5">
+<legend className="px-2">
+  <div className="inline-flex items-center gap-2 text-sm font-medium">
+    <SlidersHorizontal className="h-4 w-4 legend-title" />
+    <span className="legend-title">Slide settings</span>
+  </div>
+</legend>
 
             <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {/* Slide count */}

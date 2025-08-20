@@ -9,15 +9,18 @@ export function TopBar() {
             <div className="h-7 w-7 rounded-xl bg-gradient-to-br from-sky-400 to-indigo-500 shadow-sm" />
             <span className="text-sm sm:text-base">SlidesDeck</span>
           </div>
-          <a
-            href="https://github.com/felomondi/slidesdeck-frontend"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 text-xs sm:text-sm opacity-80 hover:opacity-100 transition"
-          >
-            <Github className="h-4 w-4" />
-            Source
-          </a>
+
+          <div className="flex items-center gap-2">
+            <a
+              href="https://github.com/felomondi/slidesdeck-frontend"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 text-xs sm:text-sm opacity-80 hover:opacity-100 transition"
+            >
+              <Github className="h-4 w-4" />
+              Source
+            </a>
+          </div>
         </div>
       </div>
     </header>
