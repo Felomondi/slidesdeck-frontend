@@ -19,7 +19,6 @@ export default function SignInPage() {
   const location = useLocation() as any;
   const from = location.state?.from?.pathname || "/";
 
-  const usernameHelp = "3–20 chars, letters/numbers/underscore; must start with a letter.";
   const usernameValid = useMemo(() => USERNAME_RE.test(username), [username]);
   const emailIsEdu = useMemo(() => EDU_EMAIL_RE.test(email.trim()), [email]);
 
