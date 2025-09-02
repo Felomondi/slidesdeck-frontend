@@ -26,9 +26,14 @@ export function FloatingThemeToggle() {
       <button
         onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
         aria-label="Toggle color mode"
-        className="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs sm:text-sm font-medium
-                   bg-white/70 dark:bg-neutral-900/70 border border-black/5 dark:border-white/10
-                   hover:bg-white/90 dark:hover:bg-neutral-800/80 transition backdrop-blur"
+        className="
+          inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs sm:text-sm font-medium shadow-sm
+          border transition backdrop-blur
+          bg-sky-100/80  border-sky-300  text-sky-900  hover:bg-sky-100/95
+          focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/70
+          dark:bg-sky-900/60 dark:border-sky-500/40 dark:text-sky-100 dark:hover:bg-sky-900/70
+          dark:focus-visible:ring-sky-600/60
+        "
       >
         {theme === "dark" ? (
           <>
