@@ -1,4 +1,4 @@
-# SlidesDeck Frontend
+# SlidesDeck
 
 An AI-powered presentation slide deck generator built with React and TypeScript. Create compelling slide presentations by simply describing your topic, and let AI generate a structured outline with talking points, visual suggestions, and speaker notes.
 
