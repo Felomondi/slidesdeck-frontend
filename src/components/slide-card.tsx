@@ -12,9 +12,10 @@ export type Slide = {
 type Props = {
   initial: Slide;
   resetKey?: number;
+  onChange?: (s: Slide) => void; // <-- added
 };
 
-export function SlideCard({ initial, resetKey }: Props) {
+export function SlideCard({ initial, resetKey, onChange }: Props) {
   const [title, setTitle] = useState(initial.slideTitle);
   const [points, setPoints] = useState<string[]>(initial.talkingPoints ?? []);
   const [notes, setNotes] = useState<string>(initial.notes ?? "");
@@ -26,6 +27,18 @@ export function SlideCard({ initial, resetKey }: Props) {
     setNotes(initial.notes ?? "");
     setVisual(initial.visualSuggestion ?? "");
   }, [initial.slideTitle, initial.talkingPoints, initial.notes, initial.visualSuggestion, resetKey]);
+
+  // NEW: report edits upward so App.tsx can save the latest version
+  useEffect(() => {
+    onChange?.({
+      slideTitle: title,
+      talkingPoints: points,
+      visualSuggestion: visual || null,
+      notes: notes || null,
+    });
+    // We intentionally omit `onChange` from deps to avoid extra calls when parent re-renders.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [title, points, visual, notes]);
 
   const uid = useId();
   const fade = useMemo(

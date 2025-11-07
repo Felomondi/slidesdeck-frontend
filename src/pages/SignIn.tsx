@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabaseClient";
 import { TopBar } from "@/components/topbar";
+import { Footer } from "@/components/footer";
 
 const USERNAME_RE = /^[a-zA-Z][a-zA-Z0-9_]{2,19}$/; // 3–20 chars, start with letter
 const EDU_EMAIL_RE = /^[^\s@]+@[^\s@]+\.edu$/i;     // ends with .edu
@@ -16,8 +17,8 @@ export default function SignInPage() {
   const [busy, setBusy] = useState(false);
 
   const navigate = useNavigate();
-  const location = useLocation() as any;
-  const from = location.state?.from?.pathname || "/";
+  const location = useLocation() as { state?: { from?: { pathname?: string } } };
+  const from = location.state?.from?.pathname || "/app";
 
   const usernameValid = useMemo(() => USERNAME_RE.test(username), [username]);
   const emailIsEdu = useMemo(() => EDU_EMAIL_RE.test(email.trim()), [email]);
@@ -51,24 +52,19 @@ export default function SignInPage() {
 
   // Try to see if the username is taken in `profiles.username` if that table exists.
   async function assertUsernameAvailable(name: string) {
-    try {
-      const { count, error } = await supabase
-        .from("profiles")
-        .select("*", { count: "exact", head: true })
-        .eq("username", name);
+    const { count, error } = await supabase
+      .from("profiles")
+      .select("*", { count: "exact", head: true })
+      .eq("username", name);
 
-      if (error) {
-        // If table doesn't exist (42P01), just skip uniqueness check gracefully.
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const code = (error as any).code;
-        if (code === "42P01") return;
-        throw error;
-      }
-      if ((count ?? 0) > 0) {
-        throw new Error("That username is already taken. Please choose another.");
-      }
-    } catch (e) {
-      throw e;
+    if (error) {
+      // If table doesn't exist (42P01), just skip uniqueness check gracefully.
+      const code = (error as { code?: string }).code;
+      if (code === "42P01") return;
+      throw error;
+    }
+    if ((count ?? 0) > 0) {
+      throw new Error("That username is already taken. Please choose another.");
     }
   }
 
@@ -119,17 +115,17 @@ export default function SignInPage() {
 
         navigate("/check-email", { state: { email }, replace: true });
 
-        // If email confirmation is enabled, user will see your “check your email” page once session exists.
+        // If email confirmation is enabled, user will see your "check your email" page once session exists.
       }
-    } catch (e: any) {
-      setErr(e.message || (mode === "signin" ? "Sign in failed" : "Sign up failed"));
+    } catch (e: unknown) {
+      setErr(e instanceof Error ? e.message : (mode === "signin" ? "Sign in failed" : "Sign up failed"));
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <div className="min-h-screen bg-app">
+    <div className="min-h-screen bg-app flex flex-col">
       <TopBar />
 
       <div className="mx-auto max-w-6xl px-4 py-10">
@@ -230,6 +226,7 @@ export default function SignInPage() {
           )}
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

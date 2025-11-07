@@ -21,22 +21,24 @@ export default function RequireAuth({ children }: { children: ReactNode }) {
         if (session) {
           setAuthed(true);
           setLoading(false);
-          // if they somehow landed on /auth while signed in, bounce home
+          // if they somehow landed on /signin or /check-email while signed in, bounce to app
           if (loc.pathname === "/signin" || loc.pathname === "/check-email") {
-            nav("/", { replace: true });
+            nav("/app", { replace: true });
           }
         } else {
           setAuthed(false);
           setLoading(false);
-          if (loc.pathname !== "/signin" && loc.pathname !== "/check-email") {
-            nav("/signin", { replace: true });
+          // redirect to landing page instead of signin
+          if (loc.pathname !== "/signin" && loc.pathname !== "/check-email" && loc.pathname !== "/") {
+            nav("/", { replace: true });
           }
         }
       } catch (e) {
         console.error("RequireAuth init failed:", e);
         setLoading(false);
-        if (loc.pathname !== "/signin" && loc.pathname !== "/check-email") {
-          nav("/signin", { replace: true });
+        // redirect to landing page instead of signin
+        if (loc.pathname !== "/signin" && loc.pathname !== "/check-email" && loc.pathname !== "/") {
+          nav("/", { replace: true });
         }
       }
     }
@@ -48,12 +50,13 @@ export default function RequireAuth({ children }: { children: ReactNode }) {
       if (session) {
         setAuthed(true);
         if (loc.pathname === "/signin" || loc.pathname === "/check-email") {
-          nav("/", { replace: true });
+          nav("/app", { replace: true });
         }
       } else {
         setAuthed(false);
-        if (loc.pathname !== "/signin" && loc.pathname !== "/check-email") {
-          nav("/signin", { replace: true });
+        // redirect to landing page instead of signin
+        if (loc.pathname !== "/signin" && loc.pathname !== "/check-email" && loc.pathname !== "/") {
+          nav("/", { replace: true });
         }
       }
     });

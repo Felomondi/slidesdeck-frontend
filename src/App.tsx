@@ -1,12 +1,14 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { TopBar } from "./components/topbar";
 import { FloatingThemeToggle } from "./components/theme-toggle";
+import { Footer } from "./components/footer";
 import { SlideCard, type Slide } from "./components/slide-card";
 import { SlideSkeleton } from "./components/skeletons";
 import { ProgressBar } from "./components/progress-bar";
 import { postJSON } from "./lib/api";
-import { Sparkles, FilePlus2, SlidersHorizontal } from "lucide-react";
+import { Sparkles, FilePlus2, SlidersHorizontal, Save as SaveIcon } from "lucide-react";
+import { savePresentation } from "@/lib/presentations"; // ✅ use helper that POSTs (upsert)
 
 type OutlineResponse = { topic: string; slides: Slide[] };
 
@@ -22,6 +24,11 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [deckKey, setDeckKey] = useState(0);
 
+  // Live edited slides + saving state
+  const [liveSlides, setLiveSlides] = useState<Slide[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [savedId, setSavedId] = useState<string | null>(null);
+
   const canGenerate = useMemo(() => brief.trim().length > 0 && !loading, [brief, loading]);
 
   async function generate() {
@@ -29,6 +36,7 @@ export default function App() {
     setError(null);
     setLoading(true);
     setOutline(null);
+    setSavedId(null); // reset any previous saved row id
 
     try {
       const data = await postJSON<OutlineResponse>("/api/generate", {
@@ -40,6 +48,7 @@ export default function App() {
       });
       setDeckKey((k) => k + 1);
       setOutline(data);
+      setLiveSlides(data.slides); // seed editable slides
     } catch {
       setError("Failed to generate outline.");
     } finally {
@@ -47,8 +56,46 @@ export default function App() {
     }
   }
 
+  // If outline changes without running generate (rare), keep liveSlides in sync
+  useEffect(() => {
+    if (outline) setLiveSlides(outline.slides);
+  }, [outline]);
+
+  // Receive per-card edits
+  function handleSlideChange(index: number, s: Slide) {
+    setLiveSlides((prev) => {
+      const base = prev.length ? prev : outline?.slides ?? [];
+      const next = [...base];
+      next[index] = s;
+      return next;
+    });
+  }
+
+  // Save (upsert) current deck by (user_id, title) on the server
+  async function saveCurrent() {
+    if (!outline) return;
+    setError(null);
+    setSaving(true);
+    try {
+      const title = (outline.topic || "Untitled presentation").trim();
+      const outlinePayload: OutlineResponse = {
+        topic: outline.topic,
+        slides: liveSlides.length ? liveSlides : outline.slides,
+      };
+
+      // This POST hits /api/presentations and your backend upserts by (user_id, title)
+      const saved = await savePresentation(title, outlinePayload);
+      setSavedId(saved.id); // keep id to flip button label to “Save changes”
+      // (optional) show a toast/snackbar here
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to save presentation.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-app">
+    <div className="min-h-screen bg-app flex flex-col">
       <TopBar />
       <FloatingThemeToggle />
 
@@ -93,12 +140,12 @@ export default function App() {
           {/* Settings with clear blue borders */}
           <fieldset className="mt-4 rounded-xl border-2 border-sky-200/80 bg-white/45 p-4
                     dark:border-sky-500/60 dark:bg-white/5">
-<legend className="px-2">
-  <div className="inline-flex items-center gap-2 text-sm font-medium">
-    <SlidersHorizontal className="h-4 w-4 legend-title" />
-    <span className="legend-title">Slide settings</span>
-  </div>
-</legend>
+            <legend className="px-2">
+              <div className="inline-flex items-center gap-2 text-sm font-medium">
+                <SlidersHorizontal className="h-4 w-4 legend-title" />
+                <span className="legend-title">Slide settings</span>
+              </div>
+            </legend>
 
             <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {/* Slide count */}
@@ -186,7 +233,12 @@ export default function App() {
                 className="grid grid-cols-1 md:grid-cols-2 gap-4"
               >
                 {outline.slides.map((s, i) => (
-                  <SlideCard key={`${deckKey}-${i}`} initial={s} resetKey={deckKey} />
+                  <SlideCard
+                    key={`${deckKey}-${i}`}
+                    initial={s}
+                    resetKey={deckKey}
+                    onChange={(val) => handleSlideChange(i, val)} // keep edits live
+                  />
                 ))}
               </motion.div>
             ) : (
@@ -204,8 +256,25 @@ export default function App() {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Floating Save button (bottom-right) */}
+          {outline && !loading && (
+            <div className="fixed bottom-6 right-6">
+              <button
+                onClick={saveCurrent}
+                disabled={saving}
+                className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-white disabled:opacity-60 disabled:cursor-not-allowed
+                           bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 shadow-sm"
+                aria-busy={saving}
+              >
+                <SaveIcon className="h-4 w-4" />
+                {saving ? "Saving…" : savedId ? "Save changes" : "Save presentation"}
+              </button>
+            </div>
+          )}
         </section>
       </main>
+      <Footer />
     </div>
   );
 }
