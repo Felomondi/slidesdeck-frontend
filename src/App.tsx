@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { TopBar } from "./components/topbar";
 import { FloatingThemeToggle } from "./components/theme-toggle";
@@ -9,10 +10,22 @@ import { ProgressBar } from "./components/progress-bar";
 import { postJSON } from "./lib/api";
 import { Sparkles, FilePlus2, SlidersHorizontal, Save as SaveIcon } from "lucide-react";
 import { savePresentation } from "@/lib/presentations"; // ✅ use helper that POSTs (upsert)
+import type { OutlineResponse as OutlineResponseType } from "@/types";
 
 type OutlineResponse = { topic: string; slides: Slide[] };
 
+type PresentationState = {
+  presentation?: {
+    id: string;
+    title: string;
+    outline_json: unknown;
+  };
+};
+
 export default function App() {
+  const location = useLocation();
+  const state = location.state as PresentationState | null;
+
   const [brief, setBrief] = useState("");
   const [slideCount, setSlideCount] = useState(8);
   const [maxBullets, setMaxBullets] = useState(5);
@@ -30,6 +43,29 @@ export default function App() {
   const [savedId, setSavedId] = useState<string | null>(null);
 
   const canGenerate = useMemo(() => brief.trim().length > 0 && !loading, [brief, loading]);
+
+  // Load presentation from navigation state (when coming from Profile page)
+  useEffect(() => {
+    if (state?.presentation) {
+      try {
+        const presentation = state.presentation;
+        const outlineData = presentation.outline_json as OutlineResponseType;
+        
+        if (outlineData && outlineData.slides) {
+          setOutline({
+            topic: outlineData.topic || presentation.title,
+            slides: outlineData.slides,
+          });
+          setLiveSlides(outlineData.slides);
+          setSavedId(presentation.id);
+          setDeckKey((k) => k + 1);
+        }
+      } catch (e) {
+        console.error("Failed to load presentation from state:", e);
+        setError("Failed to load presentation.");
+      }
+    }
+  }, [state]);
 
   async function generate() {
     if (!canGenerate) return;
@@ -230,7 +266,7 @@ export default function App() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
-                className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                className="grid grid-cols-1 lg:grid-cols-2 gap-6"
               >
                 {outline.slides.map((s, i) => (
                   <SlideCard

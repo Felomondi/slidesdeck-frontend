@@ -107,12 +107,26 @@ body {
 .legend-title { color: #075985 !important; }        /* sky-800 in light */
 .dark .legend-title { color: #ffffff !important; }  /* white in dark */
 
-/* ---- Fix: force black text in light mode, white in dark ---- */
-html:not(.dark) body { color: #0f172a; }      /* slate-900-ish for light */
-.dark body { color: #ffffff; }
+/* ---- Theme-aware text colors (toggles with dark mode) ---- */
+html:not(.dark) body { 
+  color: #111827;      /* gray-900 for light mode */
+}
+.dark body { 
+  color: #ffffff; 
+}
+
+/* Ensure all text elements inherit proper color */
+html:not(.dark) h1, 
+html:not(.dark) h2, 
+html:not(.dark) h3, 
+html:not(.dark) h4, 
+html:not(.dark) h5, 
+html:not(.dark) h6,
+html:not(.dark) p,
+html:not(.dark) span,
+html:not(.dark) div {
+  color: inherit;
+}
 
 /* Ensure inputs/textarea/buttons inherit the correct color in both themes */
 input, textarea, button, select { color: inherit; }
-
-/* (Optional) neutralize accidental global text-white on containers */
-html:not(.dark) .text-force-light { color: #0f172a !important; }

@@ -13,9 +13,15 @@ export function FloatingThemeToggle() {
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window === "undefined") return "light";
     const saved = localStorage.getItem("theme") as Theme | null;
-    return saved ?? "light";
+    const initialTheme = saved ?? "light";
+    // Apply theme immediately on initialization
+    if (typeof window !== "undefined") {
+      applyTheme(initialTheme);
+    }
+    return initialTheme;
   });
 
+  // Apply theme when it changes
   useEffect(() => {
     applyTheme(theme);
     localStorage.setItem("theme", theme);
