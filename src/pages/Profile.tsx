@@ -4,9 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabaseClient";
 import { loadPresentations } from "@/lib/presentations";
-import { TopBar } from "@/components/topbar";
-import { Footer } from "@/components/footer";
-import { FloatingThemeToggle } from "@/components/theme-toggle";
 import { FileText, Calendar, Clock, ExternalLink, Trash2, Sparkles } from "lucide-react";
 import type { OutlineResponse } from "@/types";
 
@@ -112,11 +109,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-app flex flex-col">
-      <TopBar />
-      <FloatingThemeToggle />
-      
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:py-12 flex-1">
+    <main className="mx-auto max-w-7xl px-4 py-8 sm:py-12 flex-1">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -181,7 +174,7 @@ export default function Profile() {
             ) : (
               <>
                 <div className="mb-6 flex items-center justify-between">
-                  <p className="text-sm text-gray-800 dark:text-gray-400" style={{ color: '#1f2937' }}>
+                  <p className="text-sm text-gray-800 dark:text-gray-400">
                     {items.length} {items.length === 1 ? "presentation" : "presentations"}
                   </p>
                 </div>
@@ -277,8 +270,6 @@ export default function Profile() {
             )}
           </>
         )}
-      </main>
-      <Footer />
-    </div>
+    </main>
   );
 }

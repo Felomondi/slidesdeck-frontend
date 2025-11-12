@@ -1,9 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { TopBar } from "./components/topbar";
-import { FloatingThemeToggle } from "./components/theme-toggle";
-import { Footer } from "./components/footer";
 import { SlideCard, type Slide } from "./components/slide-card";
 import { SlideSkeleton } from "./components/skeletons";
 import { ProgressBar } from "./components/progress-bar";
@@ -131,13 +128,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-app flex flex-col">
-      <TopBar />
-      <FloatingThemeToggle />
-
-      {/* Background gradient */}
-
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
+    <main className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
         {/* Generator panel */}
         <motion.section
           initial={{ opacity: 0, y: 8 }}
@@ -309,8 +300,6 @@ export default function App() {
             </div>
           )}
         </section>
-      </main>
-      <Footer />
-    </div>
+    </main>
   );
 }

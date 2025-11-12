@@ -12,7 +12,6 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { TopBar } from "@/components/topbar";
-import { FloatingThemeToggle } from "@/components/theme-toggle";
 import { Footer } from "@/components/footer";
 import { useState } from "react";
 
@@ -33,7 +32,6 @@ export default function Landing() {
       <BackgroundAuras />
 
       <TopBar />
-      <FloatingThemeToggle />
 
       {/* Hero */}
       <main className="relative mx-auto max-w-7xl px-4 pt-12 sm:pt-20 pb-24">

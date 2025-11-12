@@ -8,12 +8,19 @@ import SignIn from "./pages/Signin";
 import RequireAuth from "./components/RequireAuth";
 import CheckEmail from "./pages/CheckEmail";
 import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 import "./index.css";
+
+// Always apply dark mode on app load
+if (typeof window !== "undefined") {
+  document.documentElement.classList.add("dark");
+}
 
 const router = createBrowserRouter([
   { path: "/", element: <Landing /> },
   { path: "/signin", element: <SignIn /> },
   { path: "/profile", element: <RequireAuth><Profile /></RequireAuth> }, 
+  { path: "/settings", element: <RequireAuth><Settings /></RequireAuth> },
   { path: "/check-email", element: <CheckEmail /> },
   { path: "/app", element: <RequireAuth><App /></RequireAuth> },
 ]);

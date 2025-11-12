@@ -1,14 +1,11 @@
 // src/components/topbar.tsx
-import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; // <-- add Link
-import { ChevronDown } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabaseClient";
 
 export function TopBar() {
   const [user, setUser] = useState<User | null>(null);
-  const [open, setOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,35 +20,16 @@ export function TopBar() {
       setUser(session?.user ?? null);
     });
 
-    function onDocClick(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", onDocClick);
-
     return () => {
       mounted = false;
       sub.subscription.unsubscribe();
-      document.removeEventListener("mousedown", onDocClick);
     };
   }, []);
 
   const displayName =
     (user?.user_metadata as { username?: string } | undefined)?.username ||
     user?.email?.split("@")[0] ||
-    "Account";
-
-  async function handleSignOut() {
-    await supabase.auth.signOut();
-    setOpen(false);
-    navigate("/");
-  }
-
-  function handleViewProfile() {
-    setOpen(false);
-    navigate("/profile");
-  }
+    "there";
 
   return (
     <header className="sticky top-0 z-40">
@@ -67,8 +45,8 @@ export function TopBar() {
             <span className="text-sm sm:text-base">SlidesDeck</span>
           </Link>
 
-          {/* Right side: Sign in OR username dropdown */}
-          <div className="relative" ref={menuRef}>
+          {/* Right side: Sign in OR Hi, username */}
+          <div>
             {!user ? (
               <button
                 onClick={() => navigate("/signin")}
@@ -77,37 +55,9 @@ export function TopBar() {
                 Sign in
               </button>
             ) : (
-              <>
-                <button
-                  onClick={() => setOpen((v) => !v)}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium
-                             btn-glass border hover:opacity-90"
-                >
-                  <span className="truncate max-w-[10rem]">{displayName}</span>
-                  <ChevronDown className="h-4 w-4 opacity-70" />
-                </button>
-                {open && (
-                  <div
-                    className="absolute right-0 mt-2 w-44 glass rounded-xl border p-1 shadow-lg"
-                    role="menu"
-                  >
-                    <button
-                      onClick={handleViewProfile}
-                      className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-white/50 dark:hover:bg-white/10"
-                      role="menuitem"
-                    >
-                      View Profile
-                    </button>
-                    <button
-                      onClick={handleSignOut}
-                      className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-white/50 dark:hover:bg-white/10"
-                      role="menuitem"
-                    >
-                      Log out
-                    </button>
-                  </div>
-                )}
-              </>
+              <span className="text-sm sm:text-base font-medium text-gray-900 dark:text-white">
+                Hi, {displayName}
+              </span>
             )}
           </div>
         </div>

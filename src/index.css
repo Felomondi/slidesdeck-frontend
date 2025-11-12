@@ -3,14 +3,6 @@
 
 /* ============ Base ============ */
 :root {
-  --grid: rgba(0,0,0,0.06);
-  --glass-bg: 255 255 255;           /* light glass base */
-  --glass-alpha: 0.7;
-  --stroke: 0 0 0;                    /* black stroke in light */
-  --accent: 2 132 199;                /* sky-600 */
-}
-
-.dark {
   --grid: rgba(255,255,255,0.08);
   --glass-bg: 17 24 39;               /* slate-900-ish for dark glass */
   --glass-alpha: 0.50;                /* stronger translucency for dark */
@@ -22,28 +14,19 @@ html, body, #root { height: 100%; }
 
 body {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Cantarell, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  color: #ffffff;
 }
 
 /* ============ Backgrounds ============ */
-/* Light: very light blue. Dark: slightly dark slate with subtle color glow. */
 .bg-app {
-  background-image:
-    radial-gradient(50% 50% at 50% 0%, rgba(56,189,248,0.20) 0%, rgba(56,189,248,0) 60%),
-    radial-gradient(60% 60% at 100% 0%, rgba(99,102,241,0.20) 0%, rgba(99,102,241,0) 60%),
-    linear-gradient(to bottom, rgba(240, 249, 255, 0.92), rgba(240, 249, 255, 0.92)), /* light very-light blue */
-    linear-gradient(0deg, transparent 24%, var(--grid) 25%, var(--grid) 26%, transparent 27%, transparent 74%, var(--grid) 75%, var(--grid) 76%, transparent 77%),
-    linear-gradient(90deg, transparent 24%, var(--grid) 25%, var(--grid) 26%, transparent 27%, transparent 74%, var(--grid) 75%, var(--grid) 76%, transparent 77%);
-  background-size: auto, auto, auto, 40px 40px, 40px 40px;
-  background-position: center top, right top, 0 0, 0 0, 0 0;
-}
-
-.dark .bg-app {
   background-image:
     radial-gradient(60% 40% at 20% 0%, rgba(56,189,248,0.18) 0%, rgba(56,189,248,0) 60%),
     radial-gradient(50% 35% at 100% 0%, rgba(99,102,241,0.18) 0%, rgba(99,102,241,0) 60%),
     linear-gradient(to bottom, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.96)),   /* slightly dark slate */
     linear-gradient(0deg, transparent 24%, var(--grid) 25%, var(--grid) 26%, transparent 27%, transparent 74%, var(--grid) 75%, var(--grid) 76%, transparent 77%),
     linear-gradient(90deg, transparent 24%, var(--grid) 25%, var(--grid) 26%, transparent 27%, transparent 74%, var(--grid) 75%, var(--grid) 76%, transparent 77%);
+  background-size: auto, auto, auto, 40px 40px, 40px 40px;
+  background-position: center top, right top, 0 0, 0 0, 0 0;
 }
 
 /* ============ Glass ============ */
@@ -51,20 +34,13 @@ body {
   background-color: rgba(var(--glass-bg), var(--glass-alpha));
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(var(--stroke), 0.08);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.25) inset,
-    0 10px 30px rgba(0,0,0,0.05);
-}
-
-.dark .glass {
   border: 1px solid rgba(var(--stroke), 0.35); /* blue-ish border in dark */
   box-shadow:
     0 1px 0 rgba(255,255,255,0.04) inset,
     0 10px 30px rgba(0,0,0,0.35);
 }
 
-/* Quick helpers for blue-accented borders/text in dark */
+/* Quick helpers for blue-accented borders/text */
 .border-accent {
   border-color: rgb(var(--accent)) !important;
 }
@@ -72,18 +48,10 @@ body {
   color: rgb(var(--accent)) !important;
 }
 
-/* Make text white by default in dark; links/accented labels can use .text-accent */
-.dark body {
-  color: white;
-}
-
 /* Inputs + buttons harmonize with glass */
 .input-glass {
   @apply rounded-xl px-3 py-2 outline-none;
   background-color: rgba(var(--glass-bg), 0.75);
-  border: 1px solid rgba(var(--stroke), 0.2);
-}
-.dark .input-glass {
   border: 1px solid rgba(var(--stroke), 0.45);
   color: white;
 }
@@ -91,42 +59,40 @@ body {
 .btn-glass {
   @apply rounded-xl px-3 py-2 font-medium transition;
   background-color: rgba(var(--glass-bg), 0.85);
-  border: 1px solid rgba(var(--stroke), 0.25);
-}
-.btn-glass:hover { background-color: rgba(var(--glass-bg), 0.95); }
-.dark .btn-glass {
   border: 1px solid rgba(var(--stroke), 0.5);
   color: white;
 }
-.dark .btn-primary {
+.btn-glass:hover { 
+  background-color: rgba(var(--glass-bg), 0.95); 
+}
+
+.btn-primary {
   background: linear-gradient(180deg, rgba(56,189,248,0.20), rgba(56,189,248,0.10));
   border-color: rgba(var(--accent), 0.65);
 }
 
-/* Force the legend title color per theme, even if a parent sets text-white */
-.legend-title { color: #075985 !important; }        /* sky-800 in light */
-.dark .legend-title { color: #ffffff !important; }  /* white in dark */
-
-/* ---- Theme-aware text colors (toggles with dark mode) ---- */
-html:not(.dark) body { 
-  color: #111827;      /* gray-900 for light mode */
-}
-.dark body { 
-  color: #ffffff; 
+/* Force the legend title color */
+.legend-title { 
+  color: #ffffff !important;
 }
 
 /* Ensure all text elements inherit proper color */
-html:not(.dark) h1, 
-html:not(.dark) h2, 
-html:not(.dark) h3, 
-html:not(.dark) h4, 
-html:not(.dark) h5, 
-html:not(.dark) h6,
-html:not(.dark) p,
-html:not(.dark) span,
-html:not(.dark) div {
+h1, h2, h3, h4, h5, h6, p, span, div {
   color: inherit;
 }
 
-/* Ensure inputs/textarea/buttons inherit the correct color in both themes */
-input, textarea, button, select { color: inherit; }
+/* Ensure inputs/textarea/buttons inherit the correct color */
+input, textarea, button, select { 
+  color: inherit; 
+}
+
+/* Ensure links in sidebar inherit text color from parent (same as buttons) */
+aside a, [role="navigation"] a { 
+  color: inherit; 
+}
+
+/* Ensure SVG icons in sidebar inherit text color */
+aside svg, [role="navigation"] svg { 
+  stroke: currentColor;
+  color: inherit;
+}

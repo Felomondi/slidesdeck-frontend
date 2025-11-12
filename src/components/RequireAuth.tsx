@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { supabase } from "@/lib/supabaseClient"; // make sure this exists
+import { supabase } from "@/lib/supabaseClient";
+import { AuthenticatedLayout } from "./AuthenticatedLayout";
 
 export default function RequireAuth({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
@@ -79,6 +80,6 @@ export default function RequireAuth({ children }: { children: ReactNode }) {
     );
   }
 
-  if (!authed) return null; // we just redirected to /auth
-  return <>{children}</>;
+  if (!authed) return null; // we just redirected to /
+  return <AuthenticatedLayout>{children}</AuthenticatedLayout>;
 }
